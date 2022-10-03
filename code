@@ -1,0 +1,69 @@
+
+import SwiftUI
+
+struct ContentView: View {
+    @State var curenciesSelected = 0
+    @State var curenciesSelected2 = 1
+    @State var amount : String = ""
+    let curencies = ["USD", "EUR", "GRN", "JPY", "BITCOIN"]
+    
+    func convert(_ convert: String) -> String {
+        var conversion: Double = 1.0
+        let amount = Double(convert) ?? 0.0
+        let selectedCurrency = curencies[curenciesSelected]
+        let to = curencies[curenciesSelected2]
+        
+        var euroRates = ["USD": 0.98, "EUR": 1.0, "GRN": 36.20, "JPY": 142.12, "BITCOIN": 0.000051]
+        var usdRates = ["USD": 1.0, "EUR": 1.02, "GRN": 38.0, "JPY": 145.06, "BITCOIN": 0.000052]
+        var ukrRates = ["USD": 0.027, "EUR": 0.028, "GRN": 1.0, "JPY": 3.94, "BITCOIN": 0.0000014]
+        var jpyRates = ["USD": 0.0069, "EUR": 0.0070, "GRN": 0.25, "JPY": 1.0, "BITCOIN": 0.000000360]
+        var bitcoinRates = ["USD": 19179.90, "EUR": 19602.37, "GRN": 705435.0, "JPY": 2783147.34, "BITCOIN": 1.0]
+        switch (selectedCurrency) {
+        case "USD" :
+            conversion = amount * (usdRates[to] ?? 0.0)
+        case "EUR" :
+            conversion = amount * (euroRates[to] ?? 0.0)
+        case "GRN" :
+            conversion = amount * (ukrRates[to] ?? 0.0)
+        case "JPY" :
+            conversion = amount * (jpyRates[to] ?? 0.0)
+        case "BITCOIN" :
+            conversion = amount * (bitcoinRates[to] ?? 0.0)
+        default:
+            print("что ты вообще наделал?")
+        }
+        return String(format: "%.2f", conversion)
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Convert a currency")){
+                    TextField("enter a amount", text: $amount)
+                        .keyboardType(.decimalPad)
+                    
+                    Picker(selection: $curenciesSelected, label: Text("From")){
+                        ForEach(0 ..< curencies.count) { index in
+                            Text(self.curencies[index]).tag(index)
+                        }
+                        
+                    }
+                    Picker(selection: $curenciesSelected2, label: Text("To")){
+                        ForEach(0 ..< curencies.count) { index in
+                            Text(self.curencies[index]).tag(index)
+                        }
+                        
+                    }
+                }
+                Section(header: Text("Conversion")) {
+                    Text("\(convert(amount)) \(curencies[curenciesSelected2])")
+                }
+            }
+        }
+    }
+}
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
